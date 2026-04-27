@@ -2,7 +2,7 @@ import { useState } from "react";
 import Toast from "./Toast";
 
 export default function Login({ onLogin }) {
-  const API = "http://localhost:5000";
+  const API = "https://quiz-app-fullstack-production.up.railway.app";
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");

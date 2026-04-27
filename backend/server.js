@@ -13,11 +13,15 @@ const SECRET = process.env.JWT_SECRET;
 
 
 // ✅ CONNECT
-mongoose.connect("mongodb://127.0.0.1:27017/quiz-app")
+mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     console.log("MongoDB connected");
-    await seedData();
-    await createAdmin(); // 🔥 مهم
+
+    if (process.env.SEED === "true") {
+      console.log("🌱 Seeding...");
+      await seedData();
+      await createAdmin();
+    }
   })
   .catch(err => console.log(err));
 
@@ -424,7 +428,7 @@ app.get("/leaderboard", async (req, res) => {
     return b.totalXP - a.totalXP;
   });
 
-  res.json(data.slice(0, 10)); 
+  res.json(data.slice(0, 10));
 });
 
 app.post("/forgot-password", async (req, res) => {

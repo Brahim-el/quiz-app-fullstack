@@ -10,7 +10,7 @@ import Profile from "./Profile";
 
 
 export default function App() {
-  const API = "http://localhost:5000";
+  const API = "https://quiz-app-fullstack-production.up.railway.app";
 
   const [exams, setExams] = useState([]);
   const [selectedExam, setSelectedExam] = useState("");

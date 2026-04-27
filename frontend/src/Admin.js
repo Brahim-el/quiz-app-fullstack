@@ -12,7 +12,7 @@ import {
 } from "recharts";
 
 export default function Admin({ goBack }) {
-  const API = "http://localhost:5000";
+  const API = "https://quiz-app-fullstack-production.up.railway.app";
   const token = localStorage.getItem("token");
 
   const [activeTab, setActiveTab] = useState("dashboard");

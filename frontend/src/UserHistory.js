@@ -20,7 +20,7 @@ export default function UserHistory({ goBack, darkMode }) {
     useEffect(() => {
         if (!username) return;
 
-        fetch(`http://localhost:5000/my-results?username=${username}`)
+        fetch(`${process.env.REACT_APP_API_URL}/my-results?username=${username}`)
             .then((res) => res.json())
             .then((data) => {
                 const sortedByDate = [...data].sort(

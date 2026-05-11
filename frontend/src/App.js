@@ -332,44 +332,66 @@ export default function App() {
       <div className={`${darkMode ? "bg-gray-900 text-white" : "bg-slate-100"} min-h-screen`}>
 
         {/* NAVBAR */}
-        <div className={`${darkMode ? "bg-gray-800" : "bg-white/80 backdrop-blur-md border border-white/40 shadow-xl"}`}>
-          <div className="max-w-5xl mx-auto flex justify-between items-center px-6 py-3">
-            <h1 className="font-bold text-lg">🧠 QuizApp</h1>
+        <div className="w-full flex justify-center pt-6 px-4">
+          <div className={`w-full max-w-5xl rounded-2xl px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-2xl border backdrop-blur-xl
+  ${darkMode
+              ? "bg-gray-800/80 border-gray-700"
+              : "bg-white/70 border-white/40"
+            }`}>
 
-            <div className="flex gap-2">
-              <button onClick={() => setDarkMode(!darkMode)} className="bg-green-500 text-white px-2 py-1 rounded">
+            <h1 className="font-bold text-2xl">
+              🧠 QuizApp
+            </h1>
+
+            <div className="flex flex-wrap items-center justify-center md:justify-end gap-3">
+
+              <button
+                onClick={() => setDarkMode(!darkMode)}
+                className="bg-green-500 hover:scale-105 transition text-white px-4 py-2 rounded-xl"
+              >
                 {darkMode ? "☀️" : "🌙"}
               </button>
 
               <button
                 onClick={() => setMode("history")}
-                className="bg-indigo-500 text-white px-2 py-1 rounded"
+                className="bg-indigo-500 hover:scale-105 transition text-white px-4 py-2 rounded-xl"
               >
                 📊
               </button>
 
               <button
                 onClick={() => setShowGlobal(true)}
-                className="bg-purple-500 text-white px-3 py-2 rounded hover:scale-105 transition"
+                className="bg-purple-500 hover:scale-105 transition text-white px-4 py-2 rounded-xl"
               >
                 🌍
               </button>
 
               {!role ? (
-                <button onClick={() => setMode("login")} className="bg-blue-500 text-white px-2 py-1 rounded">
+                <button
+                  onClick={() => setMode("login")}
+                  className="bg-blue-500 hover:scale-105 transition text-white px-4 py-2 rounded-xl"
+                >
                   🔐
                 </button>
               ) : (
                 <>
                   {role === "admin" && (
-                    <button onClick={() => setMode("admin")} className="bg-green-500 text-white px-2 py-1 rounded">
+                    <button
+                      onClick={() => setMode("admin")}
+                      className="bg-green-500 hover:scale-105 transition text-white px-4 py-2 rounded-xl"
+                    >
                       ⚙️
                     </button>
                   )}
 
-                  {role === "user" &&
-                    <button className="bg-yellow-500 text-white px-3 py-2 rounded hover:scale-105 transition" onClick={() => setShowProfile(true)}>👤</button>
-                  }
+                  {role === "user" && (
+                    <button
+                      onClick={() => setShowProfile(true)}
+                      className="bg-yellow-500 hover:scale-105 transition text-white px-4 py-2 rounded-xl"
+                    >
+                      👤
+                    </button>
+                  )}
 
                   <button
                     onClick={() => {
@@ -378,7 +400,7 @@ export default function App() {
                       setMode("quiz");
                       setSelectedExam("");
                     }}
-                    className="bg-red-500 text-white px-2 py-1 rounded"
+                    className="bg-red-500 hover:scale-105 transition text-white px-4 py-2 rounded-xl"
                   >
                     🚪
                   </button>
@@ -389,7 +411,7 @@ export default function App() {
         </div>
 
         {/* MENU */}
-        <div className="max-w-5xl mx-auto px-4 flex items-center justify-center min-h-[calc(100vh-60px)]">
+        <div className="max-w-5xl mx-auto px-4 flex items-center justify-center py-10">
           <div className={`p-8 rounded-2xl shadow-xl w-full max-w-lg animate-fade-in ${darkMode ? "bg-gray-800 text-white" : "bg-white/80 backdrop-blur-md border border-white/40 shadow-xl text-gray-800"
             }`}>
 
@@ -529,13 +551,15 @@ export default function App() {
       <div className="max-w-4xl mx-auto px-4 pt-6">
 
         {/* TOP BAR */}
-        <div className={`flex justify-between items-center px-6 py-3 rounded-xl mb-6 ${darkMode ? "bg-gray-800" : "bg-white/80 backdrop-blur-md border border-white/40 shadow-xl"
+        <div className={`flex flex-col md:flex-row md:justify-between md:items-center gap-3 px-4 md:px-8 py-4 rounded-xl mb-6 ${darkMode
+          ? "bg-gray-800"
+          : "bg-white/80 backdrop-blur-md border border-white/40 shadow-xl"
           }`}>
           <button onClick={() => setSelectedExam("")} className="font-bold">
             🧠 QuizApp
           </button>
 
-          <div className="flex gap-4">
+          <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 text-sm md:text-base">
             <span>Score: {score}</span>
 
             <span>

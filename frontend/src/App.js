@@ -259,9 +259,26 @@ export default function App() {
     setCurrent((c) => {
       if (c < questions.length - 1) return c + 1;
 
+      const currentCorrectAnswers =
+        questions[current]?.answers ||
+        (questions[current]?.answer
+          ? [questions[current]?.answer]
+          : []);
+
+      const lastAnswerCorrect =
+        selected.length === currentCorrectAnswers.length &&
+        selected.every(a =>
+          currentCorrectAnswers.includes(a)
+        );
+
+      const finalScoreLocal =
+        lastAnswerCorrect
+          ? score + 1
+          : score;
+
       const percentageLocal =
         questions.length > 0
-          ? Math.round((score / questions.length) * 100)
+          ? Math.round((finalScoreLocal / questions.length) * 100)
           : 0;
 
       const isWinner = percentageLocal >= 50;
@@ -272,24 +289,9 @@ export default function App() {
       if (isWinner) achievements.push("🎖️ First Win");
       if (isPerfect) achievements.push("💎 Perfect Score");
 
-      const xp = calculateXP(score, percentageLocal);
-
       setResultAchievements(achievements);
 
-      const currentCorrectAnswers =
-        questions[current]?.answers ||
-        (questions[current]?.answer
-          ? [questions[current]?.answer]
-          : []);
-
-      saveResult(
-        selected.length === currentCorrectAnswers.length &&
-          selected.every(a =>
-            currentCorrectAnswers.includes(a)
-          )
-          ? score + 1
-          : score
-      );
+      saveResult(finalScoreLocal);
 
       setFinished(true);
 

@@ -241,12 +241,17 @@ app.delete("/questions/:id", verifyToken, async (req, res) => {
 app.post("/results", async (req, res) => {
   const { examId, score, total, username } = req.body;
 
-  const xp = Math.round((score / total) * 100);
+  const percent = total > 0
+    ? Math.round((score / total) * 100)
+    : 0;
+
+  let xp = score * 10;
+
+  if (percent === 100) xp += 50;
+  if (percent >= 50) xp += 20;
 
   const lastResult = await Result.findOne({ username })
     .sort({ createdAt: -1 });
-
-  const percent = total > 0 ? (score / total) * 100 : 0;
   const isWinner = percent >= 50;
 
 

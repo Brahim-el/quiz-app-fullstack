@@ -22,7 +22,9 @@ export default function App() {
   const [current, setCurrent] = useState(0);
   const [selected, setSelected] = useState(null);
 
-  const [timeLeft, setTimeLeft] = useState(15);
+  const QUIZ_TIME = 30;
+
+  const [timeLeft, setTimeLeft] = useState(QUIZ_TIME);
   const [score, setScore] = useState(0);
   const [finished, setFinished] = useState(false);
 
@@ -113,7 +115,7 @@ export default function App() {
   // ⏱ RESET
   useEffect(() => {
     if (!questions.length) return;
-    setTimeLeft(15);
+    setTimeLeft(QUIZ_TIME);
     setSelected(null);
   }, [current, questions]);
 

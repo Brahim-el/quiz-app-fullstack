@@ -25,7 +25,7 @@ export default function QuestionCard({
                 <div
                     className={`h-full rounded-full transition-all duration-500 ${timeLeft <= 5 ? "bg-red-500" : "bg-green-500"
                         }`}
-                    style={{ width: `${(timeLeft / 15) * 100}%` }}
+                    style={{ width: `${(timeLeft / 30) * 100}%` }}
                 />
             </div>
 

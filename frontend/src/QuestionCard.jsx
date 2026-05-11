@@ -8,7 +8,7 @@ export default function QuestionCard({
     total,
 }) {
     return (
-        <div className="animate-slide space-y-5">
+        <div className="animate-slide space-y-6 max-w-3xl mx-auto">
 
             {/* number */}
             <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
@@ -16,14 +16,34 @@ export default function QuestionCard({
             </p>
 
             {/* question */}
-            <h2 className="mb-6 font-bold text-xl md:text-2xl leading-relaxed">
+            <h2 className="mb-6 font-bold text-2xl md:text-3xl leading-loose text-center">
                 {q.question}
             </h2>
+            {/* timer */}
+            <div className="flex justify-between items-center mb-2 text-sm">
+                <span className="text-gray-400">
+                    Time Remaining
+                </span>
 
+                <span
+                    className={`font-bold ${timeLeft <= 5
+                        ? "text-red-500"
+                        : timeLeft <= 10
+                            ? "text-yellow-400"
+                            : "text-green-400"
+                        }`}
+                >
+                    {timeLeft}s
+                </span>
+            </div>
             {/* progress */}
             <div className="w-full h-3 bg-gray-200 dark:bg-gray-800 rounded-full mb-5 overflow-hidden shadow-inner">
                 <div
-                    className={`h-full rounded-full transition-all duration-500 ${timeLeft <= 5 ? "bg-red-500" : "bg-green-500"
+                    className={`h-full rounded-full transition-all duration-500 ${timeLeft <= 5
+                        ? "bg-red-500"
+                        : timeLeft <= 10
+                            ? "bg-yellow-500"
+                            : "bg-green-500"
                         }`}
                     style={{ width: `${(timeLeft / 30) * 100}%` }}
                 />
@@ -35,7 +55,7 @@ export default function QuestionCard({
                     .filter(c => c && c.trim() !== "")
                     .map((c, i) => {
                         let style =
-                            "w-full p-4 rounded-xl border text-left transition-all duration-200 font-medium";
+                            "w-full p-5 rounded-2xl border text-left transition-all duration-200 font-medium";
 
                         if (selected !== null) {
                             if (c === q.answer) {

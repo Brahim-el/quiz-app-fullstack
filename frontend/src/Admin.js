@@ -296,7 +296,7 @@ export default function Admin({ goBack }) {
     <div className="flex min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-white transition">
 
       {/* SIDEBAR */}
-      <div className="w-60 p-4 bg-white dark:bg-gray-800 border-r dark:border-gray-700">
+      <div className="w-60 h-screen sticky top-0 p-4 bg-white dark:bg-gray-800 border-r dark:border-gray-700 overflow-y-auto">
         <h1 className="text-xl font-bold mb-6">⚙️ Admin</h1>
 
         <button
@@ -339,7 +339,7 @@ export default function Admin({ goBack }) {
       </div>
 
       {/* CONTENT */}
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 h-screen overflow-y-auto">
 
         <Toast
           message={toast}
@@ -451,12 +451,13 @@ export default function Admin({ goBack }) {
                 Add
               </button>
             </div>
-
+            <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-2">
             {exams.map((e) => (
               <div key={e._id} className="card">
                 {e.title}
               </div>
             ))}
+          </div>
           </div>
         )}
 
@@ -545,7 +546,7 @@ export default function Admin({ goBack }) {
               {editingId ? "Update" : "Add"}
             </button>
 
-            <div className="mt-4">
+            <div className="mt-4 max-h-[55vh] overflow-y-auto pr-2 space-y-2">
               {questions.map((q) => (
                 <div key={q._id} className="card flex justify-between">
                   <div>

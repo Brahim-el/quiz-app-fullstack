@@ -20,7 +20,8 @@ export default function App() {
 
 
   const [current, setCurrent] = useState(0);
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState([]);
+  const [submitted, setSubmitted] = useState(false);
 
   const QUIZ_TIME = 30;
 
@@ -57,9 +58,23 @@ export default function App() {
     return xp;
   };
 
+  const currentCorrectAnswers =
+    questions[current]?.answers ||
+    (questions[current]?.answer
+      ? [questions[current]?.answer]
+      : []);
+
+  const finalScore =
+    selected.length === currentCorrectAnswers.length &&
+      selected.every(a =>
+        currentCorrectAnswers.includes(a)
+      )
+      ? score + 1
+      : score;
+
   const percentage =
     questions.length > 0
-      ? Math.round((score / questions.length) * 100)
+      ? Math.round((finalScore / questions.length) * 100)
       : 0;
 
   const xp =
@@ -116,7 +131,8 @@ export default function App() {
   useEffect(() => {
     if (!questions.length) return;
     setTimeLeft(QUIZ_TIME);
-    setSelected(null);
+    setSelected([]);
+    setSubmitted(false);
   }, [current, questions]);
 
   // ⏱ TIMER
@@ -237,7 +253,8 @@ export default function App() {
 
   // ⏭ NEXT
   const nextQuestion = () => {
-    setSelected(null);
+    setSelected([]);
+    setSubmitted(false);
 
     setCurrent((c) => {
       if (c < questions.length - 1) return c + 1;
@@ -259,7 +276,20 @@ export default function App() {
 
       setResultAchievements(achievements);
 
-      saveResult(score);
+      const currentCorrectAnswers =
+        questions[current]?.answers ||
+        (questions[current]?.answer
+          ? [questions[current]?.answer]
+          : []);
+
+      saveResult(
+        selected.length === currentCorrectAnswers.length &&
+          selected.every(a =>
+            currentCorrectAnswers.includes(a)
+          )
+          ? score + 1
+          : score
+      );
 
       setFinished(true);
 
@@ -271,13 +301,39 @@ export default function App() {
 
   // ✅ ANSWER
   const handleAnswer = (choice) => {
-    if (selected !== null) return;
 
-    setSelected(choice);
+    if (selected.includes(choice)) {
+      setSelected(
+        selected.filter(c => c !== choice)
+      );
+    } else {
+      setSelected([...selected, choice]);
+    }
+  };
 
-    if (choice === questions[current]?.answer) {
+  const submitAnswer = () => {
+
+    setSubmitted(true);
+
+    const correctAnswers =
+      questions[current]?.answers ||
+      (questions[current]?.answer
+        ? [questions[current]?.answer]
+        : []);
+
+    const isCorrect =
+      selected.length === correctAnswers.length &&
+      selected.every(a =>
+        correctAnswers.includes(a)
+      );
+
+    if (isCorrect) {
       setScore((s) => s + 1);
     }
+
+    setTimeout(() => {
+      nextQuestion();
+    }, 1500);
   };
 
   // 🔐 ROUTES
@@ -491,7 +547,7 @@ export default function App() {
           <h2 className="text-3xl font-bold">🎉 Result</h2>
 
           <p className="text-5xl font-extrabold mt-3">
-            {animatedScore} / {questions.length}
+            {finalScore} / {questions.length}
           </p>
 
           <p className="text-2xl mt-2 text-blue-500 font-bold">
@@ -598,7 +654,9 @@ export default function App() {
               q={q}
               selected={selected}
               handleAnswer={handleAnswer}
+              submitAnswer={submitAnswer}
               nextQuestion={nextQuestion}
+              submitted={submitted}
               timeLeft={timeLeft}
               current={current}
               total={questions.length}

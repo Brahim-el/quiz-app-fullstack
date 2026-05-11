@@ -25,7 +25,7 @@ export default function Admin({ goBack }) {
 
   const [question, setQuestion] = useState("");
   const [choices, setChoices] = useState(["", "", ""]);
-  const [answer, setAnswer] = useState("");
+  const [answers, setAnswers] = useState([]);
 
   const [filter, setFilter] = useState("all");
   const [toast, setToast] = useState("");
@@ -125,9 +125,11 @@ export default function Admin({ goBack }) {
     newChoices[index] = value;
     setChoices(newChoices);
 
-    // تحديث answer إلا تبدلات نفس choice
-    if (oldValue === answer) {
-      setAnswer(value);
+    // update selected answers
+    if (answers.includes(oldValue)) {
+      setAnswers(
+        answers.map(a => a === oldValue ? value : a)
+      );
     }
   };
 
@@ -142,14 +144,19 @@ export default function Admin({ goBack }) {
       .map(c => c.trim())
       .filter(c => c !== "");
 
-    const cleanAnswer = answer.trim();
+    const cleanAnswers = answers
+      .map(a => a.trim())
+      .filter(a => a !== "");
 
     if (cleanChoices.length < 2) {
       return alert("At least 2 choices required");
     }
 
-    if (!cleanAnswer || !cleanChoices.includes(cleanAnswer)) {
-      return alert("Select a valid correct answer");
+    if (
+      cleanAnswers.length === 0 ||
+      !cleanAnswers.every(a => cleanChoices.includes(a))
+    ) {
+      return alert("Select valid correct answers");
     }
 
     await fetch(`${API}/questions`, {
@@ -161,7 +168,7 @@ export default function Admin({ goBack }) {
       body: JSON.stringify({
         question: question.trim(),
         choices: cleanChoices,
-        answer: cleanAnswer,
+        answers: cleanAnswers,
         examId
       }),
     });
@@ -174,7 +181,9 @@ export default function Admin({ goBack }) {
     setEditingId(q._id);
     setQuestion(q.question);
     setChoices(q.choices);
-    setAnswer(q.answer);
+    setAnswers(
+      q.answers || (q.answer ? [q.answer] : [])
+    );
     setActiveTab("questions");
     setExamId(q.examId); // مهم
   };
@@ -192,7 +201,9 @@ export default function Admin({ goBack }) {
       .filter(c => c !== "");
 
     // 🧼 تنظيف answer
-    const cleanAnswer = answer.trim();
+    const cleanAnswers = answers
+      .map(a => a.trim())
+      .filter(a => a !== "");
 
     // ❌ أقل من 2 اختيارات
     if (cleanChoices.length < 2) {
@@ -200,8 +211,11 @@ export default function Admin({ goBack }) {
     }
 
     // ❌ answer ماشي valid
-    if (!cleanAnswer || !cleanChoices.includes(cleanAnswer)) {
-      return alert("Select a valid correct answer");
+    if (
+      cleanAnswers.length === 0 ||
+      !cleanAnswers.every(a => cleanChoices.includes(a))
+    ) {
+      return alert("Select valid correct answers");
     }
 
     try {
@@ -214,7 +228,7 @@ export default function Admin({ goBack }) {
         body: JSON.stringify({
           question: question.trim(),
           choices: cleanChoices,
-          answer: cleanAnswer,
+          answers: cleanAnswers,
         }),
       });
       setToast("Updated successfully");
@@ -222,7 +236,7 @@ export default function Admin({ goBack }) {
       // ✅ reset form
       setQuestion("");
       setChoices(["", "", ""]);
-      setAnswer("");
+      setAnswers([]);
       setEditingId(null);
 
       // 🔄 refresh questions
@@ -250,8 +264,10 @@ export default function Admin({ goBack }) {
     setChoices(newChoices);
 
     // إلا كان answer هو هداك اللي تحيد، نحيدوه
-    if (choices[index] === answer) {
-      setAnswer("");
+    if (answers.includes(choices[index])) {
+      setAnswers(
+        answers.filter(a => a !== choices[index])
+      );
     }
   };
 
@@ -304,7 +320,7 @@ export default function Admin({ goBack }) {
   const resetForm = () => {
     setQuestion("");
     setChoices(["", "", ""]);
-    setAnswer("");
+    setAnswers([]);
     setEditingId(null);
     setExamId("");
   };
@@ -514,7 +530,7 @@ export default function Admin({ goBack }) {
                 >
                   <span>{e.title}</span>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 shrink-0">
 
                     <button
                       onClick={() => handleEditExam(e)}
@@ -600,39 +616,102 @@ export default function Admin({ goBack }) {
               Add choice
             </button>
 
-            <select
-              value={answer}
-              onChange={(e) => setAnswer(e.target.value.trim())}
-              className="input mt-2"
-            >
-              <option value="" disabled>
-                Select correct answer
-              </option>
+            <div className="mt-4 space-y-2">
+              <p className="text-sm text-gray-400">
+                Select correct answers
+              </p>
+
               {choices
                 .filter(c => c && c.trim() !== "")
                 .map((c, i) => (
-                  <option key={i} value={c}>{c}</option>
+                  <label
+                    key={i}
+                    className="flex items-center gap-2 bg-gray-800 p-2 rounded"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={answers.includes(c)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setAnswers([...answers, c]);
+                        } else {
+                          setAnswers(
+                            answers.filter(a => a !== c)
+                          );
+                        }
+                      }}
+                    />
+
+                    <span>{c}</span>
+                  </label>
                 ))}
-            </select>
+            </div>
 
             <button
               onClick={editingId ? handleUpdate : handleAdd}
-              className="btn-green"
+              className="btn-green mt-5"
             >
               {editingId ? "Update" : "Add"}
             </button>
 
             <div className="mt-4 max-h-[55vh] overflow-y-auto pr-2 space-y-2">
               {questions.map((q) => (
-                <div key={q._id} className="card flex justify-between">
+                <div key={q._id} className="card flex justify-between items-start gap-4">
                   <div>
-                    <p>{q.question}</p>
-                    <p className="text-sm text-green-400 font-semibold">
-                      ✔ {q.answer}
-                    </p>
+                    <div className="flex-1">
+
+                      <p className="font-bold text-xl mb-4">
+                        {q.question}
+                      </p>
+
+                      <div className="space-y-2">
+                        {q.choices.map((choice, i) => {
+
+                          const correctAnswers =
+                            q.answers || (q.answer ? [q.answer] : []);
+
+                          const ok =
+                            correctAnswers.includes(choice);
+
+                          return (
+                            <div
+                              key={i}
+                              className={`
+            px-3 py-2 rounded-lg border text-sm
+            ${ok
+                                  ? "bg-green-500/20 border-green-500 text-green-400"
+                                  : "bg-gray-800 border-gray-700 text-gray-300"
+                                }
+          `}
+                            >
+                              {ok ? "✔ " : "• "}
+                              {choice}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {(q.answers || q.correctAnswers || []).map((a, i) => (
+                        <span
+                          key={i}
+                          className="
+        bg-green-500/20
+        text-green-400
+        border border-green-500/30
+        px-3 py-1
+        rounded-full
+        text-xs
+        font-semibold
+      "
+                        >
+                          ✔ {a}
+                        </span>
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 shrink-0">
                     <button onClick={() => handleEdit(q)} className="btn-blue">Edit</button>
                     <button onClick={() => handleDelete(q._id)} className="btn-red">Delete</button>
                   </div>

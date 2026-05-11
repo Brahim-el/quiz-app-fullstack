@@ -2,7 +2,8 @@ export default function QuestionCard({
     q,
     selected,
     handleAnswer,
-    nextQuestion,
+    submitAnswer,
+    submitted,
     timeLeft,
     current,
     total,
@@ -51,48 +52,103 @@ export default function QuestionCard({
 
             {/* answers */}
             <div className="space-y-3">
+
                 {q.choices
                     .filter(c => c && c.trim() !== "")
                     .map((c, i) => {
-                        let style =
-                            "w-full p-5 rounded-2xl border text-left transition-all duration-200 font-medium";
 
-                        if (selected !== null) {
-                            if (c === q.answer) {
-                                style += " bg-green-500 text-white border-green-500";
-                            } else if (c === selected) {
-                                style += " bg-red-500 text-white border-red-500";
-                            } else {
-                                style += " opacity-50";
+                        const active = selected.includes(c);
+
+                        const correctAnswers =
+                            q.answers || (q.answer ? [q.answer] : []);
+
+                        const isCorrect =
+                            correctAnswers.includes(c);
+
+
+                        let style = `
+        w-full p-5 rounded-2xl border text-left
+        transition-all duration-300 font-medium
+        flex items-center gap-4
+      `;
+
+                        if (submitted) {
+
+                            if (isCorrect) {
+                                style += `
+            bg-green-500
+            border-green-500
+            text-white
+          `;
                             }
+
+                            else if (active && !isCorrect) {
+                                style += `
+            bg-red-500
+            border-red-500
+            text-white
+          `;
+                            }
+
+                            else {
+                                style += `
+            opacity-50
+            bg-gray-800
+            border-gray-700
+          `;
+                            }
+
                         } else {
+
                             style += `
-    bg-white text-gray-800
-    dark:bg-gray-800 dark:text-white
-    border-gray-200 dark:border-gray-600
-    hover:bg-blue-500 hover:text-white
-    hover:border-blue-500
-    hover:shadow-lg hover:scale-[1.02]
-  `;
+          bg-white text-gray-800
+          dark:bg-gray-800 dark:text-white
+          border-gray-200 dark:border-gray-600
+          hover:bg-blue-500 hover:text-white
+          hover:border-blue-500
+          hover:scale-[1.02]
+        `;
                         }
 
                         return (
                             <button
                                 key={i}
                                 onClick={() => handleAnswer(c)}
-                                disabled={selected !== null}
+                                disabled={submitted}
                                 className={style}
                             >
-                                {c}
+
+                                <div className={`
+            min-w-[24px]
+            h-6
+            rounded-md
+            border-2
+            flex
+            items-center
+            justify-center
+            text-sm
+            font-bold
+            transition-all
+
+            ${active
+                                        ? "bg-white text-blue-500 border-white"
+                                        : "border-gray-400"
+                                    }
+          `}>
+                                    {active ? "✓" : ""}
+                                </div>
+
+                                <span>{c}</span>
+
                             </button>
                         );
                     })}
             </div>
 
             {/* next */}
-            {selected && (
+            {selected.length > 0 && !submitted && (
                 <button
-                    onClick={nextQuestion}
+                    onClick={submitAnswer}
                     className="mt-6 w-full bg-gradient-to-r from-blue-500 to-indigo-500 hover:scale-105 text-white py-2 rounded-xl shadow-lg transition"
                 >
                     Next →

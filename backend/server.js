@@ -37,7 +37,7 @@ const ExamSchema = new mongoose.Schema({
 const QuestionSchema = new mongoose.Schema({
   question: String,
   choices: [String],
-  answer: String,
+  answers: [String],
   examId: String, // 🔥 ربط مع exam
 });
 
@@ -205,9 +205,14 @@ app.get("/questions/:examId", async (req, res) => {
 
 // ADD question
 app.post("/questions", verifyToken, async (req, res) => {
-  const { question, choices, answer, examId } = req.body;
+  const { question, choices, answers, examId } = req.body;
 
-  const newQ = new Question({ question, choices, answer, examId });
+  const newQ = new Question({
+    question,
+    choices,
+    answers,
+    examId
+  });
   await newQ.save();
 
   res.json({ message: "added" });
@@ -215,11 +220,11 @@ app.post("/questions", verifyToken, async (req, res) => {
 
 // UPDATE
 app.put("/questions/:id", verifyToken, async (req, res) => {
-  const { question, choices, answer } = req.body;
+  const { question, choices, answers } = req.body;
 
   const updated = await Question.findByIdAndUpdate(
     req.params.id,
-    { question, choices, answer },
+    { question, choices, answers },
     { new: true }
   );
 

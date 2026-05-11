@@ -30,6 +30,8 @@ export default function Admin({ goBack }) {
   const [filter, setFilter] = useState("all");
   const [toast, setToast] = useState("");
 
+  const [editingExamId, setEditingExamId] = useState(null);
+
   const [stats, setStats] = useState({
     exams: 0,
     questions: 0,
@@ -253,6 +255,52 @@ export default function Admin({ goBack }) {
     }
   };
 
+  const handleDeleteExam = async (id) => {
+
+    const confirmDelete = window.confirm(
+      "Delete this exam?"
+    );
+
+    if (!confirmDelete) return;
+
+    await fetch(`${API}/exams/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    fetchExams();
+  };
+
+  const handleEditExam = (exam) => {
+    setEditingExamId(exam._id);
+    setNewExam(exam.title);
+  };
+
+  const handleUpdateExam = async () => {
+
+    if (!newExam.trim()) return;
+
+    await fetch(`${API}/exams/${editingExamId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        title: newExam.trim(),
+      }),
+    });
+
+    setEditingExamId(null);
+    setNewExam("");
+
+    fetchExams();
+  };
+
+
+
   const resetForm = () => {
     setQuestion("");
     setChoices(["", "", ""]);
@@ -447,17 +495,45 @@ export default function Admin({ goBack }) {
                 placeholder="New Exam"
                 className="input"
               />
-              <button onClick={handleAddExam} className="btn-purple">
-                Add
+              <button
+                onClick={
+                  editingExamId
+                    ? handleUpdateExam
+                    : handleAddExam
+                }
+                className="btn-purple"
+              >
+                {editingExamId ? "Update" : "Add"}
               </button>
             </div>
             <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-2">
-            {exams.map((e) => (
-              <div key={e._id} className="card">
-                {e.title}
-              </div>
-            ))}
-          </div>
+              {exams.map((e) => (
+                <div
+                  key={e._id}
+                  className="card flex justify-between items-center"
+                >
+                  <span>{e.title}</span>
+
+                  <div className="flex gap-2">
+
+                    <button
+                      onClick={() => handleEditExam(e)}
+                      className="btn-blue"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() => handleDeleteExam(e._id)}
+                      className="btn-red"
+                    >
+                      Delete
+                    </button>
+
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 

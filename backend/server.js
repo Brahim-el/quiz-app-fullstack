@@ -56,10 +56,25 @@ const ResultSchema = new mongoose.Schema({
 });
 
 const UserSchema = new mongoose.Schema({
-  username: String,
+  username: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true,
+    trim: true,
+  },
+
   password: String,
-  totalXP: { type: Number, default: 0 },
-  role: { type: String, default: "user" }, // 🔥 جديد
+
+  totalXP: {
+    type: Number,
+    default: 0,
+  },
+
+  role: {
+    type: String,
+    default: "user",
+  },
 });
 
 const User = mongoose.model("User", UserSchema);
@@ -134,7 +149,11 @@ const verifyToken = (req, res, next) => {
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
-  const user = await User.findOne({ username });
+  const cleanUsername = username.toLowerCase().trim();
+
+  const user = await User.findOne({
+    username: cleanUsername
+  });
 
   if (!user || user.role !== "admin") {
     return res.json({ success: false });
@@ -146,7 +165,11 @@ app.post("/login", async (req, res) => {
     return res.json({ success: false });
   }
 
-  const token = jwt.sign({ username }, SECRET, { expiresIn: "1h" });
+  const token = jwt.sign(
+    { username: cleanUsername },
+    SECRET,
+    { expiresIn: "1h" }
+  );
 
   res.json({ success: true, token });
 });
@@ -296,7 +319,7 @@ app.post("/results", async (req, res) => {
     examId,
     score,
     total,
-    username,
+    username: username.toLowerCase().trim(),
     achievements: newAchievements,
     xp,
     currentStreak,
@@ -307,7 +330,7 @@ app.post("/results", async (req, res) => {
 
   // 🔥 UPDATE USER TOTAL XP
   await User.findOneAndUpdate(
-    { username },
+    { username: username.toLowerCase().trim() },
     { $inc: { totalXP: xp } }
   );
 
@@ -358,25 +381,53 @@ app.get("/stats", async (req, res) => {
 });
 
 app.post("/register", async (req, res) => {
-  const { username, password } = req.body;
+  try {
+    const { username, password } = req.body;
 
-  const existing = await User.findOne({ username });
-  if (existing) {
-    return res.json({ success: false, message: "User exists" });
+    const cleanUsername = username.toLowerCase().trim();
+
+    const existingUser = await User.findOne({
+      username: cleanUsername
+    });
+
+    if (existingUser) {
+      return res.status(400).json({
+        message: "User already exists"
+      });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({
+      username: cleanUsername,
+      password: hashedPassword,
+      totalXP: 0,
+      role: "user"
+    });
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Account created!"
+    });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({
+      message: "Server error"
+    });
   }
-
-  const hashedPassword = await bcrypt.hash(password, 10);
-
-  const user = new User({ username, password: hashedPassword });
-  await user.save();
-
-  res.json({ success: true });
 });
 
 app.post("/user-login", async (req, res) => {
   const { username, password } = req.body;
 
-  const user = await User.findOne({ username });
+  const cleanUsername = username.toLowerCase().trim();
+
+  const user = await User.findOne({
+    username: cleanUsername
+  });
   if (!user) {
     return res.json({ success: false });
   }
@@ -387,7 +438,11 @@ app.post("/user-login", async (req, res) => {
     return res.json({ success: false });
   }
 
-  const token = jwt.sign({ username }, SECRET, { expiresIn: "1h" });
+  const token = jwt.sign(
+    { username: cleanUsername },
+    SECRET,
+    { expiresIn: "1h" }
+  );
   res.json({ success: true, token, username });
 });
 
@@ -434,7 +489,11 @@ app.get("/leaderboard", async (req, res) => {
 app.post("/forgot-password", async (req, res) => {
   const { username, newPassword } = req.body;
 
-  const user = await User.findOne({ username });
+  const cleanUsername = username.toLowerCase().trim();
+
+  const user = await User.findOne({
+    username: cleanUsername
+  });
 
   if (!user) {
     return res.json({ success: false, message: "User not found" });
@@ -463,6 +522,41 @@ const createAdmin = async () => {
     console.log("✅ Admin created");
   }
 };
+
+app.delete("/exams/:id", verifyToken, async (req, res) => {
+  try {
+    await Exam.findByIdAndDelete(req.params.id);
+
+    // optional: حذف questions ديال هاد exam
+    await Question.deleteMany({
+      examId: req.params.id
+    });
+
+    res.json({ message: "Exam deleted" });
+
+  } catch (err) {
+    res.status(500).json({
+      message: "Delete failed"
+    });
+  }
+});
+
+app.put("/exams/:id", verifyToken, async (req, res) => {
+  try {
+    const updated = await Exam.findByIdAndUpdate(
+      req.params.id,
+      { title: req.body.title },
+      { new: true }
+    );
+
+    res.json(updated);
+
+  } catch (err) {
+    res.status(500).json({
+      message: "Update failed"
+    });
+  }
+});
 
 // =======================
 // 🚀 START

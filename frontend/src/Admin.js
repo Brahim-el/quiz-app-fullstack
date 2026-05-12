@@ -362,28 +362,30 @@ min-h-screen
 bg-gray-100 dark:bg-gray-900
 text-gray-800 dark:text-white
 transition
-flex flex-col md:flex-row
+flex
+flex-col md:flex-row
 ">
 
       {/* SIDEBAR */}
       <div className="
-w-full md:w-60
-md:h-screen
-sticky top-0
+w-full md:w-64
+md:min-h-screen
 p-4
 bg-white dark:bg-gray-800
 border-r dark:border-gray-700
-overflow-y-auto
 shrink-0
 ">
-        <h1 className="text-xl font-bold mb-6">⚙️ Admin</h1>
+        <h1 className="text-2xl font-bold mb-6">⚙️ Admin</h1>
 
-        <div className="flex md:flex-col gap-2 overflow-x-auto">
+        <div className="
+flex flex-col gap-3
+">
           <button
             onClick={() => setActiveTab("dashboard")}
-            className={`block mb-2 px-3 py-2 rounded-lg transition ${activeTab === "dashboard"
-              ? "bg-blue-500 text-white shadow-lg"
-              : "hover:bg-gray-200 dark:hover:bg-gray-700"
+            className={`w-full text-base lg:text-lg
+px-3 py-3 rounded-lg transition ${activeTab === "dashboard"
+                ? "bg-blue-500 text-white shadow-lg"
+                : "hover:bg-gray-200 dark:hover:bg-gray-700"
               }`}
           >
             📊 Dashboard
@@ -392,9 +394,10 @@ shrink-0
 
           <button
             onClick={() => setActiveTab("exams")}
-            className={`block mb-2 px-3 py-2 rounded-lg transition ${activeTab === "exams"
-              ? "bg-blue-500 text-white"
-              : "hover:bg-gray-200 dark:hover:bg-gray-700"
+            className={`w-full text-base lg:text-lg
+px-4 py-3 rounded-xl transition ${activeTab === "exams"
+                ? "bg-blue-500 text-white"
+                : "hover:bg-gray-200 dark:hover:bg-gray-700"
               }`}
           >
             📚 Exams
@@ -402,9 +405,10 @@ shrink-0
 
           <button
             onClick={() => setActiveTab("questions")}
-            className={`block mb-2 px-3 py-2 rounded-lg transition ${activeTab === "questions"
-              ? "bg-blue-500 text-white"
-              : "hover:bg-gray-200 dark:hover:bg-gray-700"
+            className={`w-full text-base lg:text-lg
+px-4 py-3 rounded-xl transition ${activeTab === "questions"
+                ? "bg-blue-500 text-white"
+                : "hover:bg-gray-200 dark:hover:bg-gray-700"
               }`}
           >
             ❓ Questions
@@ -412,323 +416,400 @@ shrink-0
 
           <button
             onClick={goBack}
-            className="mt-10 bg-red-500 px-3 py-1 rounded hover:bg-red-600"
+            className="
+lg:mt-10
+w-full
+bg-red-500
+hover:bg-red-600
+text-white
+font-semibold
+px-4 py-3
+rounded-lg
+transition
+"
           >
             ⬅ Exit
           </button>
         </div>
-        </div>
+      </div>
 
-        {/* CONTENT */}
-        <div className="
+      {/* CONTENT */}
+      <div className="
 flex-1
-p-4 md:p-6
-overflow-y-auto
+w-full
+max-w-full
+min-w-0
+p-3 sm:p-4 md:p-6
 overflow-x-hidden
+break-words
 ">
 
-          <Toast
-            message={toast}
-            onClose={() => setToast("")}
-          />
+        <Toast
+          message={toast}
+          onClose={() => setToast("")}
+        />
 
-          {/* DASHBOARD */}
-          {activeTab === "dashboard" && (
-            <div>
-              <h2 className="text-2xl font-bold mb-4">📊 Dashboard</h2>
+        {/* DASHBOARD */}
+        {activeTab === "dashboard" && (
+          <div>
+            <h2 className="text-2xl md:text-3xl font-bold mb-4">📊 Dashboard</h2>
 
-              {/* CARDS */}
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                <Card title="Exams" value={stats.exams} />
-                <Card title="Questions" value={stats.questions} />
-                <Card title="Users" value={stats.users} />
-                <Card title="Results" value={stats.results?.length} />
-              </div>
-
-              <div className="flex gap-2 mb-4">
-                {["today", "week", "all"].map((f) => (
-                  <button
-                    key={f}
-                    onClick={() => setFilter(f)}
-                    className={`px-3 py-1 rounded-lg text-sm transition ${filter === f
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 dark:bg-gray-700"
-                      }`}
-                  >
-                    {f === "today" && "Today"}
-                    {f === "week" && "This Week"}
-                    {f === "all" && "All Time"}
-                  </button>
-                ))}
-              </div>
-
-              {/* CHART */}
-              <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow">
-                <h2 className="mb-4 font-semibold">Results Overview</h2>
-
-                {stats.results.length === 0 ? (
-                  <div className="text-center text-gray-400 py-16">
-                    📊 No results yet
-                    <p className="text-sm mt-2">Start by adding exams and users</p>
-                  </div>
-                ) : (
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={groupedData}>
-
-                      <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
-
-                      <XAxis
-                        dataKey="name"
-                        stroke="#94a3b8"
-                        tick={{ fill: "#94a3b8", fontSize: 12 }}
-                      />
-
-                      <YAxis
-                        domain={[0, 100]}
-                        stroke="#94a3b8"
-                        tick={{ fill: "#94a3b8", fontSize: 12 }}
-                      />
-
-                      <Tooltip
-                        content={<CustomTooltip />}
-                        cursor={false}
-                      />
-
-                      <Bar
-                        dataKey="score"
-                        fill="url(#colorScore)"
-                        radius={[8, 8, 0, 0]}
-                        isAnimationActive={true}
-                      >
-                        {
-                          groupedData.map((entry, index) => (
-                            <Cell key={`cell-${index}`} fill={"url(#colorScore)"} />
-                          ))
-                        }
-                      </Bar>
-
-                      <defs>
-                        <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
-                          <stop offset="100%" stopColor="#1e40af" stopOpacity={1} />
-                        </linearGradient>
-                      </defs>
-
-                    </BarChart>
-                  </ResponsiveContainer>
-                )}
-              </div>
+            {/* CARDS */}
+            <div className="
+grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4
+gap-4
+mb-6
+">
+              <Card title="Exams" value={stats.exams} />
+              <Card title="Questions" value={stats.questions} />
+              <Card title="Users" value={stats.users} />
+              <Card title="Results" value={stats.results?.length} />
             </div>
-          )}
 
-          {/* EXAMS */}
-          {activeTab === "exams" && (
-            <div>
-              <h2 className="text-2xl font-bold mb-4">📚 Manage Exams</h2>
-
-              <div className="flex gap-2 mb-4">
-                <input
-                  value={newExam}
-                  onChange={(e) => setNewExam(e.target.value)}
-                  placeholder="New Exam"
-                  className="input"
-                />
-                <button
-                  onClick={
-                    editingExamId
-                      ? handleUpdateExam
-                      : handleAddExam
-                  }
-                  className="btn-purple"
-                >
-                  {editingExamId ? "Update" : "Add"}
-                </button>
-              </div>
-              <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-2">
-                {exams.map((e) => (
-                  <div
-                    key={e._id}
-                    className="card flex justify-between items-center"
-                  >
-                    <span>{e.title}</span>
-
-                    <div className="
-flex flex-row md:flex-col
+            <div className="
+flex flex-col sm:flex-row
 gap-2
+mb-4
+">
+              {["today", "week", "all"].map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`px-3 py-1 rounded-lg text-sm transition ${filter === f
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 dark:bg-gray-700"
+                    }`}
+                >
+                  {f === "today" && "Today"}
+                  {f === "week" && "This Week"}
+                  {f === "all" && "All Time"}
+                </button>
+              ))}
+            </div>
+
+            {/* CHART */}
+            <div className="bg-white dark:bg-gray-800 p-5 rounded-xl shadow">
+              <h2 className="mb-4 font-semibold">Results Overview</h2>
+
+              {stats.results.length === 0 ? (
+                <div className="text-center text-gray-400 py-16">
+                  📊 No results yet
+                  <p className="text-sm mt-2">Start by adding exams and users</p>
+                </div>
+              ) : (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={groupedData}>
+
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+
+                    <XAxis
+                      dataKey="name"
+                      stroke="#94a3b8"
+                      tick={{ fill: "#94a3b8", fontSize: 12 }}
+                    />
+
+                    <YAxis
+                      domain={[0, 100]}
+                      stroke="#94a3b8"
+                      tick={{ fill: "#94a3b8", fontSize: 12 }}
+                    />
+
+                    <Tooltip
+                      content={<CustomTooltip />}
+                      cursor={false}
+                    />
+
+                    <Bar
+                      dataKey="score"
+                      fill="url(#colorScore)"
+                      radius={[8, 8, 0, 0]}
+                      isAnimationActive={true}
+                    >
+                      {
+                        groupedData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={"url(#colorScore)"} />
+                        ))
+                      }
+                    </Bar>
+
+                    <defs>
+                      <linearGradient id="colorScore" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#3b82f6" stopOpacity={1} />
+                        <stop offset="100%" stopColor="#1e40af" stopOpacity={1} />
+                      </linearGradient>
+                    </defs>
+
+                  </BarChart>
+                </ResponsiveContainer>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* EXAMS */}
+        {activeTab === "exams" && (
+          <div>
+            <h2 className="text-2xl font-bold mb-4">📚 Manage Exams</h2>
+
+            <div className="
+flex flex-col sm:flex-row
+gap-2
+mb-4
+">
+              <input
+                value={newExam}
+                onChange={(e) => setNewExam(e.target.value)}
+                placeholder="New Exam"
+                className="input"
+              />
+              <button
+                onClick={
+                  editingExamId
+                    ? handleUpdateExam
+                    : handleAddExam
+                }
+                className="btn-purple"
+              >
+                {editingExamId ? "Update" : "Add"}
+              </button>
+            </div>
+            <div className="max-h-[65vh] overflow-y-auto pr-2 space-y-2">
+              {exams.map((e) => (
+                <div
+                  key={e._id}
+                  className="card
+flex flex-col sm:flex-row
+justify-between
+items-start sm:items-center
+gap-4
+overflow-hidden"
+                >
+                  <span className="
+break-words
+whitespace-normal
+text-sm sm:text-base md:text-lg
+leading-relaxed
+flex-1
+w-full
+">
+                    {e.title}
+                  </span>
+
+                  <div className="
+flex
+flex-row sm:flex-col
+gap-2
+w-full sm:w-auto
 shrink-0
-w-full md:w-auto
 ">
 
-                      <button
-                        onClick={() => handleEditExam(e)}
-                        className="btn-blue"
-                      >
-                        Edit
-                      </button>
+                    <button
+                      onClick={() => handleEditExam(e)}
+                      className="btn-blue"
+                    >
+                      Edit
+                    </button>
 
-                      <button
-                        onClick={() => handleDeleteExam(e._id)}
-                        className="btn-red"
-                      >
-                        Delete
-                      </button>
+                    <button
+                      onClick={() => handleDeleteExam(e._id)}
+                      className="btn-red"
+                    >
+                      Delete
+                    </button>
 
-                    </div>
                   </div>
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
-          )}
+          </div>
+        )}
 
-          {/* QUESTIONS */}
-          {activeTab === "questions" && (
-            <div>
-              <h2 className="text-2xl font-bold mb-4">❓ Questions</h2>
+        {/* QUESTIONS */}
+        {activeTab === "questions" && (
+          <div>
+            <h2 className="text-2xl font-bold mb-4">❓ Questions</h2>
 
+            <div className="w-full max-w-full relative overflow-hidden">
               <select
                 value={examId}
                 onChange={(e) => setExamId(e.target.value)}
-                className="input"
+                className="
+input
+w-full
+max-w-full
+min-w-0
+text-[11px] sm:text-sm md:text-base
+truncate
+appearance-none
+"
+                style={{
+                  width: "100%",
+                  maxWidth: "100%",
+                  overflow: "hidden",
+                }}
               >
                 <option value="">Choose exam</option>
+
                 {exams.map((e) => (
-                  <option key={e._id} value={e._id}>
+                  <option
+                    key={e._id}
+                    value={e._id}
+                  >
                     {e.title}
                   </option>
                 ))}
               </select>
+            </div>
 
-              <input
-                value={question}
-                onChange={(e) => setQuestion(e.target.value)}
-                placeholder="Question"
-                className="input"
-              />
+            <input
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Question"
+              className="input"
+            />
 
-              {choices.map((c, i) => (
-                <div key={i} className="flex gap-2 items-center">
-                  <input
-                    value={c}
-                    placeholder={`Choice ${i + 1}`}
-                    onChange={(e) => handleChoiceChange(e.target.value, i)}
-                    className="input flex-1"
-                  />
+            {choices.map((c, i) => (
+              <div key={i} className="flex gap-2 items-center">
+                <input
+                  value={c}
+                  placeholder={`Choice ${i + 1}`}
+                  onChange={(e) => handleChoiceChange(e.target.value, i)}
+                  className="input flex-1"
+                />
 
-                  {choices.length > 2 && (
-                    <button
-                      onClick={() => handleRemoveChoice(i)}
-                      className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
-                    >
-                      ❌
-                    </button>
-                  )}
-                </div>
-              ))}
-
-              <button
-                disabled={choices.length >= 6}
-                onClick={() => {
-                  if (choices.some(c => c.trim() === "")) {
-                    return alert("Fill existing choices first");
-                  }
-
-                  setChoices([...choices, ""]);
-                }}
-                className={`mt-4 mb-3 px-4 py-2 rounded-lg shadow transition
-  ${choices.length >= 6
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:scale-105"
-                  }`}
-              >
-                Add choice
-              </button>
-
-              <div className="mt-4 space-y-2">
-                <p className="text-sm text-gray-400">
-                  Select correct answers
-                </p>
-
-                {choices
-                  .filter(c => c && c.trim() !== "")
-                  .map((c, i) => (
-                    <label
-                      key={i}
-                      className="flex items-center gap-2 bg-gray-800 p-2 rounded"
-                    >
-                      <input
-                        type="checkbox"
-                        checked={answers.includes(c)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setAnswers([...answers, c]);
-                          } else {
-                            setAnswers(
-                              answers.filter(a => a !== c)
-                            );
-                          }
-                        }}
-                      />
-
-                      <span>{c}</span>
-                    </label>
-                  ))}
+                {choices.length > 2 && (
+                  <button
+                    onClick={() => handleRemoveChoice(i)}
+                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded"
+                  >
+                    ❌
+                  </button>
+                )}
               </div>
+            ))}
 
-              <button
-                onClick={editingId ? handleUpdate : handleAdd}
-                className="btn-green mt-5"
-              >
-                {editingId ? "Update" : "Add"}
-              </button>
+            <button
+              disabled={choices.length >= 6}
+              onClick={() => {
+                if (choices.some(c => c.trim() === "")) {
+                  return alert("Fill existing choices first");
+                }
 
-              <div className="mt-4 max-h-[55vh] overflow-y-auto pr-2 space-y-2">
-                {questions.map((q) => (
-                  <div key={q._id} className="
+                setChoices([...choices, ""]);
+              }}
+              className={`mt-4 mb-3 px-4 py-2 rounded-lg shadow transition
+  ${choices.length >= 6
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:scale-105"
+                }`}
+            >
+              Add choice
+            </button>
+
+            <div className="mt-4 space-y-2">
+              <p className="text-sm text-gray-400">
+                Select correct answers
+              </p>
+
+              {choices
+                .filter(c => c && c.trim() !== "")
+                .map((c, i) => (
+                  <label
+                    key={i}
+                    className="flex items-center gap-2 bg-gray-800 p-2 rounded"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={answers.includes(c)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setAnswers([...answers, c]);
+                        } else {
+                          setAnswers(
+                            answers.filter(a => a !== c)
+                          );
+                        }
+                      }}
+                    />
+
+                    <span>{c}</span>
+                  </label>
+                ))}
+            </div>
+
+            <button
+              onClick={editingId ? handleUpdate : handleAdd}
+              className="btn-green mt-5"
+            >
+              {editingId ? "Update" : "Add"}
+            </button>
+
+            <div className="mt-4 max-h-[55vh] overflow-y-auto pr-2 space-y-2">
+              {questions.map((q) => (
+                <div
+                  key={q._id}
+                  className="
 card
-flex flex-col md:flex-row
+w-full
+min-w-0
+flex flex-col lg:flex-row
 justify-between
 items-start
 gap-4
+overflow-hidden
+"
+                >
+                  <div>
+                    <div className="flex-1">
+
+                      <p className="
+font-bold
+text-base sm:text-lg md:text-xl
+mb-4
+break-words
+leading-relaxed
+w-full
 ">
-                    <div>
-                      <div className="flex-1">
+                        {q.question}
+                      </p>
 
-                        <p className="font-bold text-xl mb-4">
-                          {q.question}
-                        </p>
+                      <div className="space-y-2">
+                        {q.choices.map((choice, i) => {
 
-                        <div className="space-y-2">
-                          {q.choices.map((choice, i) => {
+                          const correctAnswers =
+                            q.answers || (q.answer ? [q.answer] : []);
 
-                            const correctAnswers =
-                              q.answers || (q.answer ? [q.answer] : []);
+                          const ok =
+                            correctAnswers.includes(choice);
 
-                            const ok =
-                              correctAnswers.includes(choice);
-
-                            return (
-                              <div
-                                key={i}
-                                className={`
-            px-3 py-2 rounded-lg border text-sm
+                          return (
+                            <div
+                              key={i}
+                              className={`
+px-3 py-2 rounded-lg border
+text-sm sm:text-base
+break-words
+whitespace-normal
+w-full
+overflow-hidden
             ${ok
-                                    ? "bg-green-500/20 border-green-500 text-green-400"
-                                    : "bg-gray-800 border-gray-700 text-gray-300"
-                                  }
+                                  ? "bg-green-500/20 border-green-500 text-green-400"
+                                  : "bg-gray-800 border-gray-700 text-gray-300"
+                                }
           `}
-                              >
-                                {ok ? "✔ " : "• "}
-                                {choice}
-                              </div>
-                            );
-                          })}
-                        </div>
+                            >
+                              {ok ? "✔ " : "• "}
+                              {choice}
+                            </div>
+                          );
+                        })}
                       </div>
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {(q.answers || q.correctAnswers || []).map((a, i) => (
-                          <span
-                            key={i}
-                            className="
+                    </div>
+                    <div className="mt-2 flex flex-wrap gap-2">
+                      {(q.answers || q.correctAnswers || []).map((a, i) => (
+                        <span
+                          key={i}
+                          className="
         bg-green-500/20
         text-green-400
         border border-green-500/30
@@ -737,30 +818,31 @@ gap-4
         text-xs
         font-semibold
       "
-                          >
-                            ✔ {a}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="
-flex flex-row md:flex-col
-gap-2
-shrink-0
-w-full md:w-auto
-">
-                      <button onClick={() => handleEdit(q)} className="btn-blue">Edit</button>
-                      <button onClick={() => handleDelete(q._id)} className="btn-red">Delete</button>
+                        >
+                          ✔ {a}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
 
-        </div>
+                  <div className="
+flex
+flex-row sm:flex-col
+gap-2
+w-full sm:w-auto
+shrink-0
+">
+                    <button onClick={() => handleEdit(q)} className="btn-blue text-xs sm:text-sm px-3 py-2">Edit</button>
+                    <button onClick={() => handleDelete(q._id)} className="btn-red text-xs sm:text-sm px-3 py-2">Delete</button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
       </div>
+    </div>
   );
 }
 

@@ -198,38 +198,61 @@ export default function UserHistory({ goBack, darkMode }) {
                     >
                         <h3 className="mb-3 font-semibold">📈 Progress</h3>
 
-                        <ResponsiveContainer width="100%" height={250}>
-                            {chartData.length === 0 ? (
-                                <p className="text-center opacity-60 mt-4">
-                                    No data yet... start playing 🚀
-                                </p>
-                            ) : (
-                                <LineChart data={chartData}>
-                                    <XAxis dataKey="date" stroke={darkMode ? "#ccc" : "#555"} />
-                                    <YAxis domain={[0, 100]} stroke={darkMode ? "#ccc" : "#555"} />
+                        <div className="w-full h-[220px] sm:h-[320px]">
+    {chartData.length === 0 ? (
+        <p className="text-center opacity-60 mt-4">
+            No data yet... start playing 🚀
+        </p>
+    ) : (
+        <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+                data={chartData}
+                margin={{
+                    top: 10,
+                    right: 10,
+                    left: -20,
+                    bottom: 0,
+                }}
+            >
+                <XAxis
+                    dataKey="date"
+                    stroke={darkMode ? "#ccc" : "#555"}
+                    tick={{
+                        fontSize: window.innerWidth < 640 ? 9 : 12,
+                    }}
+                />
 
-                                    <Tooltip
-                                        contentStyle={{
-                                            backgroundColor: darkMode ? "#1f2937" : "#ffffff",
-                                            border: "none",
-                                            borderRadius: "10px",
-                                            color: darkMode ? "#fff" : "#000",
-                                        }}
-                                    />
+                <YAxis
+                    domain={[0, 100]}
+                    stroke={darkMode ? "#ccc" : "#555"}
+                    tick={{
+                        fontSize: window.innerWidth < 640 ? 9 : 12,
+                    }}
+                />
 
-                                    <Line
-                                        type="monotone"
-                                        dataKey="percent"
-                                        stroke="#3b82f6"
-                                        strokeWidth={3}
-                                        dot={{ r: 4 }}
-                                        activeDot={{ r: 6 }}
-                                        isAnimationActive={true}
-                                        animationDuration={800}
-                                    />
-                                </LineChart>
-                            )}
-                        </ResponsiveContainer>
+                <Tooltip
+                    contentStyle={{
+                        backgroundColor: darkMode ? "#1f2937" : "#ffffff",
+                        border: "none",
+                        borderRadius: "10px",
+                        color: darkMode ? "#fff" : "#000",
+                    }}
+                />
+
+                <Line
+                    type="monotone"
+                    dataKey="percent"
+                    stroke="#3b82f6"
+                    strokeWidth={window.innerWidth < 640 ? 2 : 3}
+                    dot={window.innerWidth >= 640}
+                    activeDot={{ r: 6 }}
+                    isAnimationActive={true}
+                    animationDuration={800}
+                />
+            </LineChart>
+        </ResponsiveContainer>
+    )}
+</div>
                     </div>
                 )}
 

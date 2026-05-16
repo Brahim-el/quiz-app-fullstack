@@ -253,54 +253,53 @@ export default function App() {
 
   // ⏭ NEXT
   const nextQuestion = async () => {
-    setSelected([]);
-    setSubmitted(false);
 
-    setCurrent((c) => {
-      if (c < questions.length - 1) return c + 1;
+  const currentCorrectAnswers =
+    questions[current]?.answers ||
+    (questions[current]?.answer
+      ? [questions[current]?.answer]
+      : []);
 
-      const currentCorrectAnswers =
-        questions[current]?.answers ||
-        (questions[current]?.answer
-          ? [questions[current]?.answer]
-          : []);
+  const lastAnswerCorrect =
+    selected.length === currentCorrectAnswers.length &&
+    selected.every(a =>
+      currentCorrectAnswers.includes(a)
+    );
 
-      const lastAnswerCorrect =
-        selected.length === currentCorrectAnswers.length &&
-        selected.every(a =>
-          currentCorrectAnswers.includes(a)
-        );
+  const finalScoreLocal =
+    lastAnswerCorrect
+      ? score + 1
+      : score;
 
-      const finalScoreLocal =
-        lastAnswerCorrect
-          ? score + 1
-          : score;
+  setSelected([]);
+  setSubmitted(false);
 
-      const percentageLocal =
-        questions.length > 0
-          ? Math.round((finalScoreLocal / questions.length) * 100)
-          : 0;
+  if (current < questions.length - 1) {
+    setCurrent((c) => c + 1);
+    return;
+  }
 
-      const isWinner = percentageLocal >= 50;
-      const isPerfect = percentageLocal === 100;
+  const percentageLocal =
+    questions.length > 0
+      ? Math.round((finalScoreLocal / questions.length) * 100)
+      : 0;
 
-      const achievements = [];
+  const isWinner = percentageLocal >= 50;
+  const isPerfect = percentageLocal === 100;
 
-      if (isWinner) achievements.push("🎖️ First Win");
-      if (isPerfect) achievements.push("💎 Perfect Score");
+  const achievements = [];
 
-      setResultAchievements(achievements);
+  if (isWinner) achievements.push("🎖️ First Win");
+  if (isPerfect) achievements.push("💎 Perfect Score");
 
-      await saveResult(finalScoreLocal);
+  setResultAchievements(achievements);
 
-      setTimeout(() => {
-        setFinished(true);
-      }, 300);
+  await saveResult(finalScoreLocal);
 
-      return c;
-    });
-  };
-
+  setTimeout(() => {
+    setFinished(true);
+  }, 300);
+};
 
 
   // ✅ ANSWER

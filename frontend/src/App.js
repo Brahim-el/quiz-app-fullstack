@@ -237,7 +237,7 @@ export default function App() {
   const saveResult = async (finalScore) => {
     const username = localStorage.getItem("username") || "Guest";
 
-    await fetch(`${API}/results`, {
+    return await fetch(`${API}/results`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -252,7 +252,7 @@ export default function App() {
   };
 
   // ⏭ NEXT
-  const nextQuestion = () => {
+  const nextQuestion = async () => {
     setSelected([]);
     setSubmitted(false);
 
@@ -291,9 +291,11 @@ export default function App() {
 
       setResultAchievements(achievements);
 
-      saveResult(finalScoreLocal);
+      await saveResult(finalScoreLocal);
 
-      setFinished(true);
+      setTimeout(() => {
+        setFinished(true);
+      }, 300);
 
       return c;
     });

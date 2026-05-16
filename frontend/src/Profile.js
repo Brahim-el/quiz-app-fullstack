@@ -13,41 +13,41 @@ export default function Profile({ goBack, darkMode }) {
             .then(res => res.json())
             .then(data => {
 
-                if (data.length === 0) return;
+                if (!data || data.length === 0) {
+
+                    setUserData({
+                        best: 0,
+                        avg: 0,
+                        total: 0,
+                        achievements: [],
+                        xp: 0,
+                        currentStreak: 0,
+                        bestStreak: 0,
+                    });
+
+                    return;
+                }
 
                 const percentages = data.map(r =>
                     r.total > 0 ? (r.score / r.total) * 100 : 0
                 );
+
                 const totalXP = data.reduce((sum, r) => sum + (r.xp || 0), 0);
 
                 const best = Math.max(...percentages);
-                const avg = percentages.reduce((a, b) => a + b, 0) / percentages.length;
+
+                const avg =
+                    percentages.reduce((a, b) => a + b, 0) / percentages.length;
 
                 const currentStreak = data[0]?.currentStreak || 0;
 
-                // const bestStreak = Math.max(...data.map(r => r.streak || 0));
-
-                // 🏆 collect achievements
                 const allAchievements = new Set();
+
                 data.forEach(r => {
                     if (r.achievements) {
                         r.achievements.forEach(a => allAchievements.add(a));
                     }
                 });
-
-                const extractWinStreak = (achievements) => {
-                    let max = 0;
-
-                    achievements.forEach(a => {
-                        const match = a.match(/(\d+)\s*Wins?/);
-                        if (match) {
-                            const num = parseInt(match[1]);
-                            if (num > max) max = num;
-                        }
-                    });
-
-                    return max;
-                };
 
                 setUserData({
                     best: Math.round(best),
@@ -60,7 +60,21 @@ export default function Profile({ goBack, darkMode }) {
                         ? Math.max(...data.map(r => r.bestStreak || 0))
                         : 0,
                 });
+            })
+            .catch(err => {
+                console.error(err);
+
+                setUserData({
+                    best: 0,
+                    avg: 0,
+                    total: 0,
+                    achievements: [],
+                    xp: 0,
+                    currentStreak: 0,
+                    bestStreak: 0,
+                });
             });
+
     }, [username]);
 
     // 🎯 LEVEL SYSTEM

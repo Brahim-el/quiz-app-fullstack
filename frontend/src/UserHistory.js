@@ -81,7 +81,14 @@ export default function UserHistory({ goBack, darkMode }) {
 
                     setChartData(formatted);
                 }
+            })
+            .catch((err) => {
+                console.error(err);
+
+                setResults([]);
+                setChartData([]);
             });
+
     }, [username]);
 
     // 🔥 number animation

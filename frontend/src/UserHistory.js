@@ -15,7 +15,10 @@ export default function UserHistory({ goBack, darkMode }) {
     const [animatedStats, setAnimatedStats] = useState({ best: 0, avg: 0, total: 0 });
     const [view, setView] = useState("summary");
 
-    const username = localStorage.getItem("username");
+    const username = localStorage
+        .getItem("username")
+        ?.toLowerCase()
+        .trim();
 
     useEffect(() => {
         if (!username) return;

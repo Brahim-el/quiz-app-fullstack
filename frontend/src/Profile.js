@@ -3,7 +3,10 @@ import { useEffect, useState } from "react";
 export default function Profile({ goBack, darkMode }) {
     const [userData, setUserData] = useState(null);
 
-    const username = localStorage.getItem("username");
+    const username = localStorage
+        .getItem("username")
+        ?.toLowerCase()
+        .trim();
 
 
     useEffect(() => {

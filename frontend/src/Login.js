@@ -121,7 +121,10 @@ export default function Login({ onLogin }) {
 
       if (data.success) {
         localStorage.setItem("token", data.token);
-        localStorage.setItem("username", data.username);
+        localStorage.setItem(
+          "username",
+          data.username.toLowerCase().trim()
+        );
         localStorage.setItem("role", "user");
         onLogin("user");
       } else {
